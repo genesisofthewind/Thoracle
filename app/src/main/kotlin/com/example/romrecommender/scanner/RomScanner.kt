@@ -16,6 +16,18 @@ class RomScanner(private val context: Context) {
         GameSystem("NES", "NES", listOf("nes")),
         GameSystem("SNES", "SNES", listOf("smc", "sfc")),
         GameSystem("N64", "N64", listOf("n64", "z64")),
+        GameSystem(
+            "Game Boy",
+            "GB",
+            listOf("gb"),
+            listOf("Game Boy", "GameBoy", "GB", "Nintendo Game Boy")
+        ),
+        GameSystem(
+            "Game Boy Color",
+            "GBC",
+            listOf("gbc"),
+            listOf("Game Boy Color", "GameBoy Color", "GBC", "Nintendo Game Boy Color")
+        ),
         GameSystem("GBA", "GBA", listOf("gba")),
         GameSystem("DS", "DS", listOf("nds")),
         GameSystem("3DS", "3DS", listOf("3ds", "cia", "cci", "cxi", "app", "3dsx")),
