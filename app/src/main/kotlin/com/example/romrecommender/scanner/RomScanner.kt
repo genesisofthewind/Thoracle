@@ -18,7 +18,7 @@ class RomScanner(private val context: Context) {
         GameSystem("N64", "N64", listOf("n64", "z64")),
         GameSystem("GBA", "GBA", listOf("gba")),
         GameSystem("DS", "DS", listOf("nds")),
-        GameSystem("3DS", "3DS", listOf("3ds")),
+        GameSystem("3DS", "3DS", listOf("3ds", "cia", "cci", "cxi", "app", "3dsx")),
         GameSystem("PSP", "PSP", listOf("iso", "cso", "pbp")),
         GameSystem(
             "PS1",
@@ -78,13 +78,17 @@ class RomScanner(private val context: Context) {
 
     private fun scanSystemFolder(folder: DocumentFile, system: GameSystem): List<RomGame> {
         val roms = mutableListOf<RomGame>()
-        folder.listFiles().forEach { file ->
+        val files = folder.listFiles().sortedBy { if (it.isPreferredGameFolder(system)) 0 else 1 }
+
+        files.forEach { file ->
             if (file.isFile) {
                 val extension = file.name?.substringAfterLast('.', "")?.lowercase() ?: ""
                 if (system.extensions.contains(extension)) {
                     val cleanName = cleanGameName(file.name ?: "Unknown")
                     roms.add(RomGame(file.name ?: "Unknown", cleanName, system, file.uri.toString()))
                 }
+            } else if (file.isDirectory && !file.isIgnoredGameFolder()) {
+                roms.addAll(scanSystemFolder(file, system))
             }
         }
         return roms
@@ -92,6 +96,17 @@ class RomScanner(private val context: Context) {
 
     private fun GameSystem.matchesFolderName(folderName: String?): Boolean {
         return folderAliases.any { it.equals(folderName, ignoreCase = true) }
+    }
+
+    private fun DocumentFile.isPreferredGameFolder(system: GameSystem): Boolean {
+        val folderName = name ?: return false
+        return preferredGameFolderNames.any { it.equals(folderName, ignoreCase = true) } ||
+            system.matchesFolderName(folderName)
+    }
+
+    private fun DocumentFile.isIgnoredGameFolder(): Boolean {
+        val folderName = name ?: return false
+        return ignoredGameFolderNames.any { it.equals(folderName, ignoreCase = true) }
     }
 
     /**
@@ -114,5 +129,10 @@ class RomScanner(private val context: Context) {
         name = name.replace("_", " ")
         
         return name.trim()
+    }
+
+    companion object {
+        private val preferredGameFolderNames = listOf("Roms", "ROMs", "Games")
+        private val ignoredGameFolderNames = listOf("DLC", "Updates", "Update", "User", "Saves", "Save Data")
     }
 }
