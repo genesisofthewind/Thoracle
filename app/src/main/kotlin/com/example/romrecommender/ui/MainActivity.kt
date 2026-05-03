@@ -15,6 +15,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.romrecommender.data.ScanResultStorage
 import com.example.romrecommender.model.ScanResult
 import com.example.romrecommender.recommender.RecommendationEngine
 import com.example.romrecommender.scanner.RomScanner
@@ -48,10 +49,12 @@ fun RomAppNavigation() {
     val context = LocalContext.current
     val scanner = remember { RomScanner(context) }
     val recommender = remember { RecommendationEngine() }
+    val scanResultStorage = remember { ScanResultStorage(context) }
+    val savedScanState = remember { scanResultStorage.load() }
     val coroutineScope = rememberCoroutineScope()
 
-    var selectedFolderUri by remember { mutableStateOf<Uri?>(null) }
-    var scanResult by remember { mutableStateOf<ScanResult?>(null) }
+    var selectedFolderUri by remember { mutableStateOf(savedScanState.selectedFolderUri) }
+    var scanResult by remember { mutableStateOf(savedScanState.scanResult) }
     var isScanning by remember { mutableStateOf(false) }
 
     // Folder picker launcher
@@ -110,9 +113,12 @@ fun RomAppNavigation() {
                                 isScanning = true
 
                                 try {
-                                    scanResult = withContext(Dispatchers.IO) {
-                                        scanner.scanFolder(uri)
+                                    val result = withContext(Dispatchers.IO) {
+                                        val scannedResult = scanner.scanFolder(uri)
+                                        scanResultStorage.save(uri, scannedResult)
+                                        scannedResult
                                     }
+                                    scanResult = result
                                 } catch (e: Exception) {
                                     e.printStackTrace()
                                 } finally {
