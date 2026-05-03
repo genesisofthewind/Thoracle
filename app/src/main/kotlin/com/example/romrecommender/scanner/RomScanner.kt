@@ -19,6 +19,12 @@ class RomScanner(private val context: Context) {
         GameSystem("GBA", "GBA", listOf("gba")),
         GameSystem("DS", "DS", listOf("nds")),
         GameSystem("3DS", "3DS", listOf("3ds", "cia", "cci", "cxi", "app", "3dsx")),
+        GameSystem(
+            "Nintendo Switch",
+            "Switch",
+            listOf("nsp", "xci", "nsz", "xcz"),
+            listOf("Switch", "Nintendo Switch", "NSW")
+        ),
         GameSystem("PSP", "PSP", listOf("iso", "cso", "pbp")),
         GameSystem(
             "PS1",
@@ -45,9 +51,36 @@ class RomScanner(private val context: Context) {
             listOf("wad"),
             listOf("WiiWare", "WAD", "WADs")
         ),
-        GameSystem("Dreamcast", "DC", listOf("cdi", "gdi")),
-        GameSystem("Genesis", "Genesis", listOf("md", "gen")),
-        GameSystem("Saturn", "Saturn", listOf("iso", "bin"))
+        GameSystem(
+            "Genesis",
+            "Genesis",
+            listOf("md", "gen", "smd", "bin"),
+            listOf("Genesis", "Sega Genesis", "Mega Drive", "MegaDrive", "MD")
+        ),
+        GameSystem(
+            "Master System",
+            "Master System",
+            listOf("sms"),
+            listOf("Master System", "Sega Master System", "SMS")
+        ),
+        GameSystem(
+            "Game Gear",
+            "Game Gear",
+            listOf("gg"),
+            listOf("Game Gear", "Sega Game Gear", "GG")
+        ),
+        GameSystem(
+            "Saturn",
+            "Saturn",
+            listOf("cue", "bin", "iso", "chd", "m3u"),
+            listOf("Saturn", "Sega Saturn")
+        ),
+        GameSystem(
+            "Dreamcast",
+            "DC",
+            listOf("cdi", "gdi", "chd"),
+            listOf("Dreamcast", "Sega Dreamcast", "DC")
+        )
     )
 
     fun scanFolder(rootUri: Uri): ScanResult {
