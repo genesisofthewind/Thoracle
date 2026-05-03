@@ -19,11 +19,32 @@ class RomScanner(private val context: Context) {
         GameSystem("GBA", "GBA", listOf("gba")),
         GameSystem("DS", "DS", listOf("nds")),
         GameSystem("3DS", "3DS", listOf("3ds")),
-        GameSystem("PSP", "PSP", listOf("iso", "cso")),
-        GameSystem("PS1", "PS1", listOf("bin", "cue", "iso")),
-        GameSystem("PS2", "PS2", listOf("iso")),
-        GameSystem("GameCube", "GC", listOf("iso", "gcm")),
-        GameSystem("Wii", "Wii", listOf("iso", "wbfs")),
+        GameSystem("PSP", "PSP", listOf("iso", "cso", "pbp")),
+        GameSystem(
+            "PS1",
+            "PS1",
+            listOf("bin", "cue", "iso", "chd", "pbp", "m3u", "img", "ccd"),
+            listOf("PS1", "PSX", "PlayStation", "PlayStation 1")
+        ),
+        GameSystem("PS2", "PS2", listOf("iso", "chd", "gz")),
+        GameSystem(
+            "GameCube",
+            "GC",
+            listOf("iso", "gcm", "rvz", "ciso"),
+            listOf("GameCube", "GC", "NGC", "Nintendo GameCube")
+        ),
+        GameSystem(
+            "Wii",
+            "Wii",
+            listOf("iso", "wbfs", "rvz", "wad"),
+            listOf("Wii", "Nintendo Wii")
+        ),
+        GameSystem(
+            "WiiWare",
+            "WiiWare",
+            listOf("wad"),
+            listOf("WiiWare", "WAD", "WADs")
+        ),
         GameSystem("Dreamcast", "DC", listOf("cdi", "gdi")),
         GameSystem("Genesis", "Genesis", listOf("md", "gen")),
         GameSystem("Saturn", "Saturn", listOf("iso", "bin"))
@@ -40,7 +61,7 @@ class RomScanner(private val context: Context) {
         rootDir.listFiles().forEach { file ->
             if (file.isDirectory) {
                 // Check if folder name matches a system
-                val system = supportedSystems.find { it.folderName.equals(file.name, ignoreCase = true) }
+                val system = supportedSystems.find { it.matchesFolderName(file.name) }
                 if (system != null) {
                     systemsFound.add(system)
                     val games = scanSystemFolder(file, system)
@@ -67,6 +88,10 @@ class RomScanner(private val context: Context) {
             }
         }
         return roms
+    }
+
+    private fun GameSystem.matchesFolderName(folderName: String?): Boolean {
+        return folderAliases.any { it.equals(folderName, ignoreCase = true) }
     }
 
     /**

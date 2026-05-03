@@ -54,6 +54,7 @@ class ScanResultStorage(context: Context) {
             .put("name", name)
             .put("folderName", folderName)
             .put("extensions", JSONArray(extensions))
+            .put("folderAliases", JSONArray(folderAliases))
     }
 
     private fun RomGame.toJson(): JSONObject {
@@ -95,11 +96,19 @@ class ScanResultStorage(context: Context) {
     private fun JSONObject.toGameSystem(): GameSystem {
         val extensionsJson = getJSONArray("extensions")
         val extensions = List(extensionsJson.length()) { index -> extensionsJson.getString(index) }
+        val aliasesJson = optJSONArray("folderAliases")
+        val folderName = getString("folderName")
+        val folderAliases = if (aliasesJson != null) {
+            List(aliasesJson.length()) { index -> aliasesJson.getString(index) }
+        } else {
+            listOf(folderName)
+        }
 
         return GameSystem(
             name = getString("name"),
-            folderName = getString("folderName"),
-            extensions = extensions
+            folderName = folderName,
+            extensions = extensions,
+            folderAliases = folderAliases
         )
     }
 

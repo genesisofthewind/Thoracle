@@ -6,7 +6,8 @@ package com.example.romrecommender.model
 data class GameSystem(
     val name: String,
     val folderName: String,
-    val extensions: List<String>
+    val extensions: List<String>,
+    val folderAliases: List<String> = listOf(folderName)
 )
 
 /**
